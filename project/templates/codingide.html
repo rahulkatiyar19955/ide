@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="content-section">
+        <form action="/codingide" method="post" enctype="multipart/form-data">
+            <textarea rows="10" cols="70" name="code_editor"
+>#include<bits/stdc++.h>
+using namespace std;
+int main()
+{
+   return 0;
+}
+            </textarea>
+            <br>
+            <br>
+            <br>
+            <br>
+            Choose the file: <input type="file" name="code1"/><BR>
+                <input type="submit" value="Upload"/>
+        </form>
+</div>
+
+{% endblock content %}
