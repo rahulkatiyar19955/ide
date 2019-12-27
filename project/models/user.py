@@ -15,7 +15,9 @@ class UserModel(db.Model, UserMixin):
     username = db.Column(db.String(80), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(80))
-    image_file = db.Column(db.String(20), default='default.jpg')
+    image_file = db.Column(db.String(200), default='default.jpg')
+    role = db.Column(db.Integer, default=1)
+    # codefiles = db.relationship("CodeBase")
 
     def get_reset_token(self, expires_sec=1800):
         s = Serializer(application.config['SECRET_KEY'], expires_sec)
@@ -32,7 +34,7 @@ class UserModel(db.Model, UserMixin):
 
     # output when user object is returned
     def __repr__(self):
-        return f"User('{self.username}','{self.email}')"
+        return f"User('{self.username}','{self.email}','{self.id}')"
 
     def __init__(self, username, password, email):
         self.username = username

@@ -10,7 +10,10 @@ application = Flask(__name__)
 # amazondata
 # admin HjDfCtUBkLhWHX1LKda0 database1.calnggnlssfl.us-east-1.rds.amazonaws.com
 # application.config['SQLALCHEMY_DATABASE_URI'] = "mysql+pymysql://admin:amazondata@database1.calnggnlssfl.us-east-1.rds.amazonaws.com/database1"
-application.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///test.db"
+application.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///user.db"
+application.config['SQLALCHEMY_BINDS'] = {'codebase': "sqlite:///cb.db",
+                                          'testcases': "sqlite:///tc.db",
+                                          'problems': "sqlite:///prob.db"}
 application.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 application.config['SECRET_KEY'] = 'MY_SECRET_KEY'
 db = SQLAlchemy(application)
@@ -18,6 +21,7 @@ bcrypt = Bcrypt(application)
 login_manager = LoginManager(application)
 login_manager.login_view = 'login'
 login_manager.login_message_category = 'info'
+
 application.config['Mail_SERVER'] = 'smtp.gmail.com'
 application.config['MAIL_PORT'] = 587
 application.config['MAIL_USE_TLS'] = True

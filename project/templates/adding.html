@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+{% block content %}
+    <article class="media content-section">
+          <div class="form-group">
+              <h3> Adding Problem</h3>
+              <br>
+          <form action="/adding" method="post">
+              Title: <input type="text" name="title"/><br/>
+              Difficult: <select name="difficulty">
+                          <option value="Easy" selected>Easy</option>
+                          <option value="Medium">Medium</option>
+                          <option value="Hard">Hard</option>
+                        </select><br/>
+              Content: <input type="text" name="Content"/><br/>
+              Input: <input type="text" name="Input"/><br/>
+              Output: <input type="text" name="Output"/><br/>
+              Explanation: <input type="text" name="Explanation"/><br/>
+              Constraint: <input type="text" name="Constraint"/><br/>
+              Test_case1: <input type="text" name="Test_case1"/><br/>
+              <input type="submit" value="Upload"/><br/>
+          </form>
+          </div>
+    </article>
+
+{% endblock content %}

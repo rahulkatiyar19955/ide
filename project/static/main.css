@@ -78,3 +78,10 @@ a.article-title:hover {
 .account-heading {
   font-size: 2.5rem;
 }
+
+.text-muted {
+  font-size: medium;
+  /* background-color:#0c6fc5; */
+  color: rgb(241, 9, 9) !important;
+  display: none;
+}

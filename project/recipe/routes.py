@@ -1,11 +1,16 @@
 import os
+import subprocess
+import filecmp
 import secrets
 from PIL import Image
-from flask import render_template, url_for, flash, redirect, request
+import io
+from flask import render_template, url_for, flash, redirect, request, send_file
 from project import application, db, bcrypt, mail
 from project.form import RegistrationForm, LoginForm, UpdateAccountForm, RequestResetForm, ResetPasswordForm
 from project.models.user import UserModel
 from project.models.code_base import CodeBase
+from project.models.prob import Prob
+from project.models.test_cases import Testcases
 from flask_login import login_user, current_user, logout_user, login_required
 from flask_mail import Message
 
@@ -19,9 +24,76 @@ def create_tables():
 @application.route('/home')
 def home():
     if current_user.is_authenticated:
-        problems = CodeBase.query.all()
-        return render_template('home.html',codeBase=problems)
+        problem_list = Prob.query.all()
+        return render_template('home.html', data=problem_list)
     return render_template('home.html')
+
+
+@application.route('/problems/<problem_id>', methods=['GET', 'POST'])
+def problems(problem_id):
+    if current_user.is_authenticated:
+        p = Prob.get_from_id(problem_id)
+        # return p.title
+        # test_cases = Testcases.get_from_project_id(problem_id)
+        return render_template('problem.html', problem=p)  # , test_cases=test_cases)
+    return render_template(url_for(login))
+
+
+@application.route('/testing', methods=['GET', 'POST'])
+def test():
+    t = Testcases(1, 2, 1, 1)
+    t.save_to_db()
+    return 'save'
+
+
+@application.route('/problems/<problem_id>/upload', methods=['POST'])
+def problem_upload(problem_id):
+    if current_user.is_authenticated:
+        if 'code1' in request.files:
+            data_file = request.files['code1']
+            filename = str(current_user.id) + '.cpp'
+            # filename = 'custom' + '.cpp'
+
+            # print(os.getcwd())
+            upload_code = CodeBase(data_file.read(), problem_id, current_user.id)
+            upload_code.save_to_db()
+            file1 = CodeBase.get_by_id(upload_code.id)
+            dir_path = os.path.join(os.getcwd(), 'project/temp_codefolder/')
+            with open(dir_path + filename, 'wb') as f:
+                f.write(file1.code_file)
+            # file1.code_file.save(os.path.join(dir_path, filename))
+            p = Prob.get_from_id(problem_id)
+            test_cases = Testcases.get_from_project_id(problem_id)
+            return redirect(url_for('upload', filename=filename), code=307)
+            # return render_template('problem.html', problem=p, test_cases=test_cases)
+        # p = Prob.get_from_id(problem_id)
+        # return p.title
+        # return render_template('problem.html', problem=p)
+        #     return 'upload code for ' + problem_id
+    # return render_template(url_for(home))
+
+
+@application.route('/adding', methods=['GET', 'POST'])
+def adding():
+    if current_user.is_authenticated:
+        if request.method == 'GET':
+            return render_template('adding.html')
+        else:
+            title = request.form['title']
+            difficulty = request.form['difficulty']
+            content = request.form['Content']
+            Input = request.form['Input']
+            Output = request.form['Output']
+            Constraint = request.form['Constraint']
+            Explanation = request.form['Explanation']
+            test_case1 = request.form['Test_case1']
+            p = Prob(title=title, difficulty=difficulty, content=content, input1=Input,
+                     output1=Output, constraint=Constraint, test_case1=test_case1, explanation=Explanation)
+            p.save_to_db()
+            flash(f'New Problem added with Title:  {title}', 'success')
+            # return str(title + difficulty + content)
+            return render_template(url_for(adding))
+    return render_template(url_for(login))
 
 
 @application.route('/login', methods=['POST', 'GET'])
@@ -140,7 +212,68 @@ def reset_token(token):
     return render_template('reset_token.html', title='Reset Password', form=form)
 
 
+def compile_code(name: str, tc: str):
+    display_str = "Compiled Successfully "
+    cmd1 = ['g++', 'project/temp_codefolder/' + name, '-o', 'project/temp_codefolder/' + name + '.out']
+    compiler_out = subprocess.Popen(cmd1, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    o, e = compiler_out.communicate()
+    if compiler_out.returncode == 0:
+        try:
+            # print()
+
+            cmd2 = 'timeout 5s ' + './project/temp_codefolder/' + name + '.out' + ' </project/test_input/input' + tc + '.txt >project/temp_codefolder/output' + tc + '.txt'
+            status_code = subprocess.Popen(cmd2, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+
+            o1, e1 = status_code.communicate()
+            if status_code.returncode == 124:
+                display_str += " <br> Time Limit exceeds"
+                return False, display_str
+            return True, display_str
+        except Exception as e:
+            return False, display_str + str(e)
+    else:
+        compiler_error = e.decode('utf-8')
+        return False, compiler_error
+
+
+@application.route('/successful_upload')
+def successful_upload():
+    r, compiler_output = compile_code("code1.cpp", "1")
+    a = False
+    if r is True:
+        try:
+            a = filecmp.cmp('test_output/ref_out1.txt', 'code_output/output1.txt')
+        except Exception as e:
+            print("error: ", e)
+    return render_template('result.html', compiler_output=compiler_output, a=a)
+
+
 @application.route('/codingide', methods=['POST', 'GET'])
 @login_required
 def codingIde():
-    return render_template('codingide.html')
+    if request.method == 'POST':
+        if 'code1' in request.files:
+            data_file = request.files['code1']
+            if data_file.filename != '':
+                pass
+                # create a database to store code file that are
+                # uploded by users
+                # data_file.save(os.path.join(os.getcwd() + '/code_file', 'code1.cpp'))
+            return redirect(url_for('successful_upload'))
+    else:
+        return render_template('codingide.html')
+
+
+@application.route('/upload/<filename>', methods=['POST', 'GET'])
+def upload(filename: str):
+    if request.method == 'POST':
+        bool_result, compiler_output = compile_code(filename, "1")
+        a = False
+        if bool_result is True:
+            try:
+                a = filecmp.cmp('test_output/ref_out1.txt', 'code_output/output1.txt')
+            except Exception as e:
+                print("error: ", e)
+        return render_template('result.html', compiler_output=compiler_output, a=a)
+    else:
+        return render_template('codingide.html')
