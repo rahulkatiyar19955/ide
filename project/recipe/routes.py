@@ -324,8 +324,8 @@ def run_code(name: str, tc: str):
 @application.route('/successful_upload', methods=['POST', 'GET'])
 def successful_upload():
     code_filename = 'temp' + str(current_user.id) + '.cpp'
-    input_filename = 'temp' + str(current_user.id)
-    output_filename = 'output' + input_filename
+    input_filename = 'inputtemp' + str(current_user.id)
+    output_filename = str(current_user.id) + 'output' + input_filename
     r, compiler_output, compiler_message = compile_code(code_filename, input_filename)
     prog_output = ""
     if r is True :
