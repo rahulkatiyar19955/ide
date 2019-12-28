@@ -4,15 +4,38 @@
           <div class="form-group">
               <h3> Adding Problem</h3>
               <br>
-          <form action="/adding" method="post">
-              Title: <input type="text" name="title"/><br/>
+          <input type="button" onclick="problem_add.style.display='block';problem_delete.style.display='none';" value="Add Problem">
+          <input type="button" onclick="problem_delete.style.display='block';problem_add.style.display='none';" value="delete Problem">
+
+          <form action="/deleting" name='problem_delete' style="display:none" method="post">
+          <div class="form-group">
+              Problems: <select name="problem_delete">
+
+                        {% for problem in problems %}
+                            <option value={{problem.id}} selected>{{problem.title}}</option>
+                        {% endfor %}
+                        </select><br/>
+          </div>
+          <input type="submit" value="Delete"/><br/>
+          </form>
+
+          <form action="/adding" name='problem_add' style="display:none" method="post">
+              <div class="form-group">
+              Title: <input type="text" name="title"/>
+              </div>
+              <div class="form-group">
               Difficult: <select name="difficulty">
                           <option value="Easy" selected>Easy</option>
                           <option value="Medium">Medium</option>
                           <option value="Hard">Hard</option>
                         </select><br/>
-              Content: <input type="text" name="Content"/><br/>
-              Input: <input type="text" name="Input"/><br/>
+              </div>
+              <div class="form-group">
+              Content: <input type="text" name="Content"/>
+              </div>
+              <div class="form-group">
+              Input: <input type="text" name="Input"/>
+              </div>
               Output: <input type="text" name="Output"/><br/>
               Explanation: <input type="text" name="Explanation"/><br/>
               Constraint: <input type="text" name="Constraint"/><br/>

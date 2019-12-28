@@ -1,0 +1,49 @@
+{% extends "layout.html" %}
+{% block content %}
+<article class="media content-section" xmlns="http://www.w3.org/1999/html">
+
+          <div class="form-group">
+              <h3> Adding Testcases</h3>
+              <br>
+            <input type="button" onclick="form_add.style.display='none';form_show.style.display='block';" value="Show all"/>
+            <input type="button" onclick="form_add.style.display='block';form_show.style.display='none';" value="Add New"/>
+
+          <form action="/showtestcases" style="display:none" name="form_show" method="post">
+              <div class="form-group">
+              Problem: <select onchange="test.value=this.options[this.selectedIndex].value;" name="prob_id" id="prob_selected">
+                          {% for problem in problems %}
+                            <option value={{problem.id}} selected>{{problem.title}}</option>
+                          {% endfor %}
+                        </select>
+              </div>
+              <div class="form-group">
+                  <input type="submit" value="Show"/><br/>
+              </div>
+          </form>
+          <form action="/addingtestcases" style="display:none" name="form_add" method="post">
+              <div class="form-group">
+              Problem: <select onchange="test.value=this.options[this.selectedIndex].value;" name="prob_id" id="prob_selected">
+                          {% for problem in problems %}
+                            <option value={{problem.id}} selected>{{problem.title}}</option>
+                          {% endfor %}
+                        </select>
+              </div>
+
+              <div class="form-group" >Input:<br/>
+              <textarea  name="Input"></textarea>
+              </div>
+<!--              <div class="form-group">-->
+<!--                test: <input type="text" name="test" id='test' value="9"/>-->
+<!--              </div>-->
+              <div class="form-group">Output:<br/>
+              <textarea name="Output"></textarea>
+              </div>
+              <div class="form-group">Timeout:<br/>
+              <input type='number' name="Timeout" value="1"/>
+              </div>
+              <input type="submit" value="Upload"/><br/>
+          </form>
+          </div>
+    </article>
+
+{% endblock content %}

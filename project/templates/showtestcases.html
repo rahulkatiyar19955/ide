@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+{% block content %}
+    {% for testcase in testcases %}
+        <article class="media content-section">
+          <div class="media-body">
+            <div class="article-metadata">
+              <small class="text-enhance">TestCase {{ loop.index }}:</small>
+                <a class="mr-2" href="/delete/testcase/{{testcase.id}}">delete</a>
+            </div>
+            <p class="article-content">input: {{ testcase.input }}</p>
+            <p class="article-content">output: {{ testcase.output }}</p>
+            <p class="article-content">timeout: {{ testcase.timeout }}</p>
+          </div>
+        </article>
+    {% endfor %}
+{% endblock content %}

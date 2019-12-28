@@ -5,10 +5,21 @@
             <div class="article-metadata">
               <a class="mr-2" href="#"> {{compiler_output}}</a>
             </div>
-              <h2><a class="article-title" >{{ compiler_message }}</a></h2>
+              <h6><a class="article-content" >{{ compiler_message }}</a></h6>
               </br>
               Output
             <p class="article-content">{{ prog_output }}</p>
           </div>
+        </article>
+        <article class="media content-section">
+            <div class="media-body">
+              {% for a,b,c in test_cases %}
+              <div class="article-metadata">
+                <a class="mr-2" href="#"> TestCase {{loop.index}}: </a>
+                <small class="text-enhance">{{ b }}</small>
+              </div>
+              <h2><a class="article-title" >{{ c }}</a></h2>
+              {% endfor %}
+            </div>
         </article>
 {% endblock content %}

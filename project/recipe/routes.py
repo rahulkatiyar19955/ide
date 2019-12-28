@@ -63,8 +63,8 @@ def problem_upload(problem_id):
                 f.write(file1.code_file)
             # file1.code_file.save(os.path.join(dir_path, filename))
             p = Prob.get_from_id(problem_id)
-            test_cases = Testcases.get_from_project_id(problem_id)
-            return redirect(url_for('upload', filename=filename), code=307)
+            # test_cases = Testcases.get_from_project_id(problem_id)
+            return redirect(url_for('upload', filename=filename, problemid=p.id), code=307)
             # return render_template('problem.html', problem=p, test_cases=test_cases)
         # p = Prob.get_from_id(problem_id)
         # return p.title
@@ -72,12 +72,78 @@ def problem_upload(problem_id):
         #     return 'upload code for ' + problem_id
     # return render_template(url_for(home))
 
+@application.route('/delete/testcase/<testcase_id>', methods=['GET'])
+def deletetestcases(testcase_id):
+    if current_user.is_authenticated and current_user.role == 2:
+        Testcases.query.filter_by(id=testcase_id).delete()
+        db.session.commit()
+        flash(f'Test Case deleted successfully', 'success')
+        return redirect(url_for('addingtestcases'))
+    return redirect(url_for('home'))
+
+
+@application.route('/showtestcases', methods=['POST'])
+def showtestcases():
+    if request.method == 'POST':
+        try:
+            prob_id = request.form['prob_id']
+        except:
+            flash(f'No Test Case detected', 'danger')
+            return redirect(url_for('addingtestcases'))
+        testcases = Testcases.query.filter_by(problem_id=prob_id)
+        return render_template('showtestcases.html', testcases=testcases)
+
+
+@application.route('/addingtestcases', methods=['GET', 'POST'])
+def addingtestcases():
+    if request.method == 'GET':
+        problems = Prob.query.all()
+        return render_template('addingtestcases.html', problems=problems)
+    if request.method == 'POST':
+        prob_id = request.form['prob_id']
+        input_file = request.form['Input']
+        output_file = request.form['Output']
+        timeout = request.form['Timeout']
+
+        testcase = Testcases(input1=input_file, output=output_file, problem_id=prob_id, timeout=timeout)
+        testcase.save_to_db()
+        input_filename = 'problem' + str(prob_id) + 'test' + str(testcase.id) + '.txt'
+        output_filename = 'refoutput' + input_filename
+        dir_path = os.path.join(os.getcwd(), 'project/test_io/')
+        with open(dir_path + input_filename, 'wt') as f:
+            f.write(input_file)
+        with open(dir_path + output_filename, 'wt') as f:
+            f.write(output_file)
+        prob = Prob.get_from_id(prob_id)
+        prob.test_case_number += 1
+        db.session.commit()
+        flash(f'New Test Case added with Id:  {testcase.id} for Problem: {prob.title}', 'success')
+        return redirect(url_for('addingtestcases'))
+
+
+@application.route('/deleting', methods=['POST'])
+def deleting():
+    if current_user.is_authenticated and current_user.role == 2:
+        try:
+            prob_id = request.form['problem_delete']
+        except:
+            flash(f'No more Problem detected', 'danger')
+            return redirect(url_for('adding'))
+        problem = Prob.query.filter_by(id=prob_id).delete()
+        testcase = Testcases.query.filter_by(problem_id=prob_id).delete()
+        # db.session.delete(testcase)
+        # db.session.delete(problem)
+        db.session.commit()
+        flash(f'Problem deleted successfully','success')
+        return redirect(url_for('adding'))
+    return redirect(url_for('home'))
 
 @application.route('/adding', methods=['GET', 'POST'])
 def adding():
-    if current_user.is_authenticated and current_user.role==2:
+    if current_user.is_authenticated and current_user.role == 2:
         if request.method == 'GET':
-            return render_template('adding.html')
+            list_of_problems = Prob.query.all()
+            return render_template('adding.html',problems=list_of_problems)
         else:
             title = request.form['title']
             difficulty = request.form['difficulty']
@@ -86,13 +152,13 @@ def adding():
             Output = request.form['Output']
             Constraint = request.form['Constraint']
             Explanation = request.form['Explanation']
-            test_case1 = request.form['Test_case1']
+            # test_case1 = request.form['Test_case1']
             p = Prob(title=title, difficulty=difficulty, content=content, input1=Input,
-                     output1=Output, constraint=Constraint, test_case1=test_case1, explanation=Explanation)
+                     output1=Output, constraint=Constraint, explanation=Explanation)
             p.save_to_db()
             flash(f'New Problem added with Title:  {title}', 'success')
             # return str(title + difficulty + content)
-            return render_template(url_for(adding))
+            return redirect(url_for('adding'))
     else:
         return redirect(url_for('login'))
 
@@ -219,41 +285,61 @@ def compile_code(name: str, tc: str):
     compiler_out = subprocess.Popen(cmd1, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     o, e = compiler_out.communicate()
     if compiler_out.returncode == 0:
-        try:
-            # print()
-
-            cmd2 = 'timeout 5s ' + './project/temp_codefolder/' + name + '.out' + ' <project/test_io/input' + tc + '.txt >project/test_io/output' + tc + '.txt'
-            # print(cmd2)
-            status_code = subprocess.Popen(cmd2, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-
-            o1, e1 = status_code.communicate()
-            if status_code.returncode == 124:
-                display_str = "Time Limit exceeds"
-                return False, "Compiled Successfully ", display_str
-            return True, "Compiled Successfully ",''
-        except Exception as e:
-            return False, "Compiled Successfully ",str(e)
+        # b,e = run_code(name,tc)
+        # try:
+        #     # print()
+        #
+        #     cmd2 = 'timeout 5s ' + './project/temp_codefolder/' + name + '.out' + ' <project/test_io/input' + tc + '.txt >project/test_io/output' + tc + '.txt'
+        #     # print(cmd2)
+        #     status_code = subprocess.Popen(cmd2, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+        #
+        #     o1, e1 = status_code.communicate()
+        #     if status_code.returncode == 124:
+        #         display_str = "Time Limit exceeds"
+        #         return False, "Compiled Successfully ", display_str
+        #     return True, "Compiled Successfully ", ''
+        # except Exception as e:
+        # return b, "Compiled Successfully ", str(e)
+        return True, "Compiled Successfully ", ''
     else:
         compiler_error = e.decode('utf-8')
         return False, "Compiled Unsuccessfull ", compiler_error
 
 
-@application.route('/successful_upload', methods = ['POST','GET'])
+def run_code(name: str, tc: str):
+    try:
+        cmd2 = 'timeout 5s ' + './project/temp_codefolder/' + name + '.out' + ' <project/test_io/' + tc + '.txt >project/test_io/' + str(current_user.id) + 'output' + tc + '.txt'
+        # print(cmd2)
+        status_code = subprocess.Popen(cmd2, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+
+        o1, e1 = status_code.communicate()
+        if status_code.returncode == 124:
+            display_str = "Time Limit exceeds"
+            return False, display_str
+        return True, ''
+    except Exception as e:
+        return False, str(e)
+
+
+@application.route('/successful_upload', methods=['POST', 'GET'])
 def successful_upload():
     code_filename = 'temp' + str(current_user.id) + '.cpp'
     input_filename = 'temp' + str(current_user.id)
-    output_filename = 'output'+ input_filename
+    output_filename = 'output' + input_filename
     r, compiler_output, compiler_message = compile_code(code_filename, input_filename)
-    prog_output = ''
-    if r is True:
-        dir_path = os.path.join(os.getcwd(), 'project/test_io/')
-        with open(dir_path + output_filename + '.txt', 'rt') as f:
-            prog_output = f.read()
-        # try:
-        #     a = filecmp.cmp('test_output/ref_out1.txt', 'code_output/output1.txt')
-        # except Exception as e:
-        #     print("error: ", e)
-    return render_template('result.html', compiler_output=compiler_output, prog_output=prog_output , compiler_message=compiler_message)
+    prog_output = ""
+    if r is True :
+        out, compiler_message = run_code(code_filename, input_filename)
+        if out is True:
+            dir_path = os.path.join(os.getcwd(), 'project/test_io/')
+            with open(dir_path + output_filename + '.txt', 'rt') as f:
+                prog_output = f.read()
+            # try:
+            #     a = filecmp.cmp('test_output/ref_out1.txt', 'code_output/output1.txt')
+            # except Exception as e:
+            #     print("error: ", e)
+    return render_template('result.html', compiler_output=compiler_output, prog_output=prog_output,
+                           compiler_message=compiler_message)
 
 
 @application.route('/codingide', methods=['POST', 'GET'])
@@ -276,16 +362,33 @@ def codingIde():
         return render_template('codingide.html')
 
 
-@application.route('/upload/<filename>', methods=['POST', 'GET'])
-def upload(filename: str):
+@application.route('/upload/<filename>/<problemid>', methods=['POST', 'GET'])
+def upload(filename: str, problemid):
     if request.method == 'POST':
-        bool_result, compiler_output,compiler_message = compile_code(filename, "1")
-        a = False
-        if bool_result is True:
-            try:
-                a = filecmp.cmp('test_output/ref_out1.txt', 'code_output/output1.txt')
-            except Exception as e:
-                print("error: ", e)
-        return render_template('result.html', compiler_output=compiler_output, a=a)
+        test_cases = Testcases.get_from_project_id(problemid)
+        t = []
+
+        bool_result, compiler_output, compiler_message = compile_code(filename, '')
+        # compiler_output = 'not compiled'
+        if bool_result:
+            for test in test_cases:
+                print(test.id)
+                testcase = 'problem' + str(problemid) + 'test' + str(test.id)
+                a = False
+                run_bool, compiler_message = run_code(filename, testcase)
+                # t.append((test.id, bool_result, compiler_message))
+                if run_bool is True:
+                    try:
+                        # pass
+                        output_filename = 'output'+'problem' + str(problemid) + 'test' + str(test.id) + '.txt'
+                        a = filecmp.cmp('project/test_io/ref'+ output_filename, 'project/test_io/'+ str(current_user.id) + output_filename)
+                    except Exception as e:
+                        # print("error: ", e)
+                        compiler_message += str(e)
+                t.append((test.id, a, compiler_message))
+            return render_template('result.html', compiler_output=compiler_output, a=a, test_cases=t)
+        else:
+            flash(f'Compiled Unsuccessful:', 'danger')
+            return render_template('result.html', compiler_output=compiler_output)
     else:
         return render_template('codingide.html')

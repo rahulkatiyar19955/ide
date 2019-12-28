@@ -30,7 +30,8 @@
               <a class="nav-item nav-link" href="{{ url_for('home') }}">About</a>
               {% if current_user.is_authenticated %}
                 {% if current_user.role == 2 %}
-                    <a class="nav-item nav-link" href="{{ url_for('adding') }}">ADD</a>
+                    <a class="nav-item nav-link" href="{{ url_for('adding') }}">Problems</a>
+                    <a class="nav-item nav-link" href="{{ url_for('addingtestcases') }}">Testcases</a>
                 {% endif %}
               <a class="nav-item nav-link" href="{{ url_for('codingIde') }}">Ide</a>
               {% endif %}

@@ -11,17 +11,17 @@ class Prob(db.Model):
     input1 = db.Column(db.Text, nullable=False)
     output1 = db.Column(db.Text, nullable=False)
     constraint = db.Column(db.Text, nullable=False)
-    test_case1 = db.Column(db.Text, nullable=False)
+    test_case_number = db.Column(db.Integer, nullable=False) #change name to test_case_number and default to 0
     explanation = db.Column(db.Text, nullable=False)
 
-    def __init__(self, title, difficulty, content, input1, output1, constraint, test_case1, explanation):
+    def __init__(self, title, difficulty, content, input1, output1, constraint, explanation):
         self.title = title
         self.difficulty = difficulty
         self.content = content
         self.input1 = input1
         self.output1 = output1
         self.constraint = constraint
-        self.test_case1 = test_case1
+        self.test_case_number = 0
         self.explanation = explanation
 
     @classmethod

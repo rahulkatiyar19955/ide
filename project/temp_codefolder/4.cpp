@@ -5,7 +5,9 @@ int main()
 {
 	int t;
 	cin>>t;
-	cout<<2*t;as
+	cout<<t;
+	//if(t==1)
+	//while(1);
 	return 0;
 }
 
