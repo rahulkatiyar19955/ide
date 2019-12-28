@@ -75,7 +75,7 @@ def problem_upload(problem_id):
 
 @application.route('/adding', methods=['GET', 'POST'])
 def adding():
-    if current_user.is_authenticated:
+    if current_user.is_authenticated and current_user.role==2:
         if request.method == 'GET':
             return render_template('adding.html')
         else:
@@ -93,7 +93,8 @@ def adding():
             flash(f'New Problem added with Title:  {title}', 'success')
             # return str(title + difficulty + content)
             return render_template(url_for(adding))
-    return render_template(url_for(login))
+    else:
+        return redirect(url_for('login'))
 
 
 @application.route('/login', methods=['POST', 'GET'])
@@ -213,7 +214,7 @@ def reset_token(token):
 
 
 def compile_code(name: str, tc: str):
-    display_str = "Compiled Successfully "
+    # display_str = "Compiled Successfully "
     cmd1 = ['g++', 'project/temp_codefolder/' + name, '-o', 'project/temp_codefolder/' + name + '.out']
     compiler_out = subprocess.Popen(cmd1, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     o, e = compiler_out.communicate()
@@ -221,45 +222,56 @@ def compile_code(name: str, tc: str):
         try:
             # print()
 
-            cmd2 = 'timeout 5s ' + './project/temp_codefolder/' + name + '.out' + ' </project/test_input/input' + tc + '.txt >project/temp_codefolder/output' + tc + '.txt'
+            cmd2 = 'timeout 5s ' + './project/temp_codefolder/' + name + '.out' + ' <project/test_io/input' + tc + '.txt >project/test_io/output' + tc + '.txt'
+            # print(cmd2)
             status_code = subprocess.Popen(cmd2, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
 
             o1, e1 = status_code.communicate()
             if status_code.returncode == 124:
-                display_str += " <br> Time Limit exceeds"
-                return False, display_str
-            return True, display_str
+                display_str = "Time Limit exceeds"
+                return False, "Compiled Successfully ", display_str
+            return True, "Compiled Successfully ",''
         except Exception as e:
-            return False, display_str + str(e)
+            return False, "Compiled Successfully ",str(e)
     else:
         compiler_error = e.decode('utf-8')
-        return False, compiler_error
+        return False, "Compiled Unsuccessfull ", compiler_error
 
 
-@application.route('/successful_upload')
+@application.route('/successful_upload', methods = ['POST','GET'])
 def successful_upload():
-    r, compiler_output = compile_code("code1.cpp", "1")
-    a = False
+    code_filename = 'temp' + str(current_user.id) + '.cpp'
+    input_filename = 'temp' + str(current_user.id)
+    output_filename = 'output'+ input_filename
+    r, compiler_output, compiler_message = compile_code(code_filename, input_filename)
+    prog_output = ''
     if r is True:
-        try:
-            a = filecmp.cmp('test_output/ref_out1.txt', 'code_output/output1.txt')
-        except Exception as e:
-            print("error: ", e)
-    return render_template('result.html', compiler_output=compiler_output, a=a)
+        dir_path = os.path.join(os.getcwd(), 'project/test_io/')
+        with open(dir_path + output_filename + '.txt', 'rt') as f:
+            prog_output = f.read()
+        # try:
+        #     a = filecmp.cmp('test_output/ref_out1.txt', 'code_output/output1.txt')
+        # except Exception as e:
+        #     print("error: ", e)
+    return render_template('result.html', compiler_output=compiler_output, prog_output=prog_output , compiler_message=compiler_message)
 
 
 @application.route('/codingide', methods=['POST', 'GET'])
 @login_required
 def codingIde():
     if request.method == 'POST':
-        if 'code1' in request.files:
-            data_file = request.files['code1']
-            if data_file.filename != '':
-                pass
-                # create a database to store code file that are
-                # uploded by users
-                # data_file.save(os.path.join(os.getcwd() + '/code_file', 'code1.cpp'))
-            return redirect(url_for('successful_upload'))
+        code_file = request.form['code_editor']
+        input_file = request.form['input']
+        dir_path = os.path.join(os.getcwd(), 'project/temp_codefolder/')
+        dir_path_io = os.path.join(os.getcwd(), 'project/test_io/')
+        code_filename = 'temp' + str(current_user.id) + '.cpp'
+        input_filename = 'inputtemp' + str(current_user.id) + '.txt'
+        # print(code_file)
+        with open(dir_path + code_filename, 'wt') as f:
+            f.write(code_file)
+        with open(dir_path_io + input_filename, 'wt') as f:
+            f.write(input_file)
+        return redirect(url_for('successful_upload'), code=307)
     else:
         return render_template('codingide.html')
 
@@ -267,7 +279,7 @@ def codingIde():
 @application.route('/upload/<filename>', methods=['POST', 'GET'])
 def upload(filename: str):
     if request.method == 'POST':
-        bool_result, compiler_output = compile_code(filename, "1")
+        bool_result, compiler_output,compiler_message = compile_code(filename, "1")
         a = False
         if bool_result is True:
             try:

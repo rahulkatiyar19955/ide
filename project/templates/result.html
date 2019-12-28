@@ -1,15 +1,14 @@
 {% extends "layout.html" %}
 {% block content %}
-    {% for problem in data %}
         <article class="media content-section">
           <div class="media-body">
             <div class="article-metadata">
-              <a class="mr-2" href="{{ url_for('problems',problem_id=problem.id) }}">#{{ problem.id }}</a>
-              <small class="text-muted">{{ problem.title }}</small>
+              <a class="mr-2" href="#"> {{compiler_output}}</a>
             </div>
-            <h2><a class="article-title" href="{{ url_for('problems',problem_id=problem.id) }}">{{ problem.title }}</a></h2>
-            <p class="article-content">{{ problem.difficulty }}</p>
+              <h2><a class="article-title" >{{ compiler_message }}</a></h2>
+              </br>
+              Output
+            <p class="article-content">{{ prog_output }}</p>
           </div>
         </article>
-    {% endfor %}
 {% endblock content %}
