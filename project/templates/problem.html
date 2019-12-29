@@ -3,18 +3,27 @@
 {% set problem_path = '/problems/' + problem_id|string + '/upload' %}
 {% block content %}
         <article class="media content-section">
-          <div class="media-body">
+          <div class="media-bodyr">
             <div class="article-metadata">
               <a class="mr-2" href="{{ url_for('problems',problem_id=problem.id) }}">#{{ problem.id }}</a>
               <small class="text-muted">{{ problem.difficulty }}</small>
             </div>
             <h2><a class="article-title" >{{ problem.title }}</a></h2>
             <p class="article-content">{{ problem.content }}</p>
-            <p class="article-content">
-                <b>Input: </b>{{problem.input1}}
-                <b>Output: </b>{{problem.output1}}
-                <b>Explanation: </b>{{problem.explanation}}
+            <b>Input: </b>
+            <p class="article-withborder">
+                {{problem.input1}}
             </p>
+              <b>Output: </b>
+            <p class="article-withborder">
+                 {{problem.output1}}
+            </p>
+            <b>Explanation: </b>
+            <p class="article-withborder">
+                 {{problem.explanation}}
+            </p>
+
+
           </div>
         </article>
         <article class="media content-section">

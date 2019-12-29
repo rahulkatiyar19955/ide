@@ -32,6 +32,24 @@ h1, h2, h3, h4, h5, h6 {
   margin-bottom: 20px;
 }
 
+.article-withborder {
+  padding-top: 0px;
+  padding-bottom: 0px;
+  padding-right: 5px;
+  margin-right: 0px;
+  margin-left: 0px;
+  padding-left: 5px;
+  background: #bbbbbb;
+  /* padding: 10px 50px; */
+  border: 1px solid steelblue;
+  border-radius: 5px;
+  white-space: pre-line;
+  
+  /* text-align: left; */
+  /* text-align-last: left; */
+
+}
+
 .article-title {
   color: #444444;
 }

@@ -31,6 +31,7 @@ def home():
 
 @application.route('/problems/<problem_id>', methods=['GET', 'POST'])
 def problems(problem_id):
+    # if request.method=='GET':
     if current_user.is_authenticated:
         p = Prob.get_from_id(problem_id)
         # return p.title
