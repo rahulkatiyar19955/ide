@@ -1,7 +1,15 @@
 from project import db, login_manager, application
 from flask_login import UserMixin
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
+from flask_admin.contrib.sqla import ModelView
+from flask_login import current_user
 
+class userView(ModelView):
+    def is_accessible(self):
+        if current_user.is_authenticated:
+            if current_user.role == 2:
+                return True
+        return False
 
 @login_manager.user_loader
 def load_user(user_id):

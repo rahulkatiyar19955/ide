@@ -3,6 +3,9 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 from flask_mail import Mail
+from flask_admin import Admin
+
+
 
 application = Flask(__name__)
 # mysql+pymysql://<db_user>:<db_password>@<endpoint>/<db_url>
@@ -16,7 +19,11 @@ application.config['SQLALCHEMY_BINDS'] = {'codebase': "sqlite:///cb.db",
                                           'problems': "sqlite:///prob.db"}
 application.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 application.config['SECRET_KEY'] = 'MY_SECRET_KEY'
+admin = Admin(application)
+
 db = SQLAlchemy(application)
+
+
 bcrypt = Bcrypt(application)
 login_manager = LoginManager(application)
 login_manager.login_view = 'login'

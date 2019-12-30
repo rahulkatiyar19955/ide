@@ -8,6 +8,7 @@ cffi==1.13.2
 Click==7.0
 docutils==0.15.2
 Flask==1.1.1
+Flask-Admin==1.5.4
 Flask-Bcrypt==0.7.1
 Flask-JWT==0.3.2
 Flask-Login==0.4.1

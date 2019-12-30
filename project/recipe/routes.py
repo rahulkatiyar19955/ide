@@ -5,14 +5,26 @@ import secrets
 from PIL import Image
 import io
 from flask import render_template, url_for, flash, redirect, request, send_file
-from project import application, db, bcrypt, mail
+from project import application, db, bcrypt, mail, admin
 from project.form import RegistrationForm, LoginForm, UpdateAccountForm, RequestResetForm, ResetPasswordForm
-from project.models.user import UserModel
-from project.models.code_base import CodeBase
-from project.models.prob import Prob
-from project.models.test_cases import Testcases
+from project.models.user import UserModel,userView
+from project.models.code_base import CodeBase,codeBaseView
+from project.models.prob import Prob, probView
+from project.models.test_cases import Testcases, testCaseView
 from flask_login import login_user, current_user, logout_user, login_required
 from flask_mail import Message
+from flask_admin.contrib.fileadmin import FileAdmin
+
+class custom_FileAdmin(FileAdmin):
+    can_download = True
+
+code_path = os.path.join(os.getcwd(), 'project/temp_codefolder')
+admin.add_view(custom_FileAdmin(code_path, '/project/', name='Code Dir'))
+# admin.add_view(FileAdmin(code_path, '/project/static/profile_pics', name='Profile Pics'))
+admin.add_view(probView(Prob, db.session))
+admin.add_view(codeBaseView(CodeBase, db.session))
+admin.add_view(userView(UserModel, db.session))
+admin.add_view(testCaseView(Testcases, db.session))
 
 
 @application.before_first_request
@@ -72,6 +84,7 @@ def problem_upload(problem_id):
         # return render_template('problem.html', problem=p)
         #     return 'upload code for ' + problem_id
     # return render_template(url_for(home))
+
 
 @application.route('/delete/testcase/<testcase_id>', methods=['GET'])
 def deletetestcases(testcase_id):
@@ -135,16 +148,17 @@ def deleting():
         # db.session.delete(testcase)
         # db.session.delete(problem)
         db.session.commit()
-        flash(f'Problem deleted successfully','success')
+        flash(f'Problem deleted successfully', 'success')
         return redirect(url_for('adding'))
     return redirect(url_for('home'))
+
 
 @application.route('/adding', methods=['GET', 'POST'])
 def adding():
     if current_user.is_authenticated and current_user.role == 2:
         if request.method == 'GET':
             list_of_problems = Prob.query.all()
-            return render_template('adding.html',problems=list_of_problems)
+            return render_template('adding.html', problems=list_of_problems)
         else:
             title = request.form['title']
             difficulty = request.form['difficulty']
@@ -309,7 +323,8 @@ def compile_code(name: str, tc: str):
 
 def run_code(name: str, tc: str):
     try:
-        cmd2 = 'timeout 5s ' + './project/temp_codefolder/' + name + '.out' + ' <project/test_io/' + tc + '.txt >project/test_io/' + str(current_user.id) + 'output' + tc + '.txt'
+        cmd2 = 'timeout 5s ' + './project/temp_codefolder/' + name + '.out' + ' <project/test_io/' + tc + '.txt >project/test_io/' + str(
+            current_user.id) + 'output' + tc + '.txt'
         # print(cmd2)
         status_code = subprocess.Popen(cmd2, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
 
@@ -329,7 +344,7 @@ def successful_upload():
     output_filename = str(current_user.id) + 'output' + input_filename
     r, compiler_output, compiler_message = compile_code(code_filename, input_filename)
     prog_output = ""
-    if r is True :
+    if r is True:
         out, compiler_message = run_code(code_filename, input_filename)
         if out is True:
             dir_path = os.path.join(os.getcwd(), 'project/test_io/')
@@ -371,6 +386,7 @@ def upload(filename: str, problemid):
 
         bool_result, compiler_output, compiler_message = compile_code(filename, '')
         # compiler_output = 'not compiled'
+        print(bool_result)
         if bool_result:
             for test in test_cases:
                 print(test.id)
@@ -380,16 +396,28 @@ def upload(filename: str, problemid):
                 # t.append((test.id, bool_result, compiler_message))
                 if run_bool is True:
                     try:
-                        # pass
-                        output_filename = 'output'+'problem' + str(problemid) + 'test' + str(test.id) + '.txt'
-                        a = filecmp.cmp('project/test_io/ref'+ output_filename, 'project/test_io/'+ str(current_user.id) + output_filename)
+                        dir_path = "project/test_io/"
+                        ref_out = ''
+                        user_out = ''
+                        ref_in = ''
+
+                        input_filename = 'problem' + str(problemid) + 'test' + str(test.id) + '.txt'
+                        output_filename = 'output' + 'problem' + str(problemid) + 'test' + str(test.id) + '.txt'
+                        with open(dir_path + "ref" + output_filename, 'rt') as f:
+                            ref_out = f.read()
+                        with open(dir_path + str(current_user.id) + output_filename, 'rt') as f2:
+                            user_out = f2.read()
+                        with open(dir_path + input_filename, 'rt') as f3:
+                            ref_in = f3.read()
+                        a = filecmp.cmp('project/test_io/ref' + output_filename,
+                                        'project/test_io/' + str(current_user.id) + output_filename)
                     except Exception as e:
                         # print("error: ", e)
                         compiler_message += str(e)
-                t.append((test.id, a, compiler_message))
-            return render_template('result.html', compiler_output=compiler_output, a=a, test_cases=t)
+                t.append((test.id, a, compiler_message,ref_in,ref_out,user_out))
+            return render_template('result.html', compiler_message=compiler_message,compiler_output=compiler_output, a=a, test_cases=t)
         else:
             flash(f'Compiled Unsuccessful:', 'danger')
-            return render_template('result.html', compiler_output=compiler_output)
+            return render_template('result.html', compiler_message=compiler_message)
     else:
         return render_template('codingide.html')

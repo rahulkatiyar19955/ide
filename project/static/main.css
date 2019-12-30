@@ -50,6 +50,13 @@ h1, h2, h3, h4, h5, h6 {
 
 }
 
+.article-withborder2 {
+  background: #ececec;
+  border: 1px solid steelblue;
+  border-radius: 5px;
+
+}
+
 .article-title {
   color: #444444;
 }

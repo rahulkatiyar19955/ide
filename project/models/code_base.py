@@ -1,7 +1,18 @@
 from project import db
 from project.models.user import UserModel
 from datetime import datetime
+from flask_admin.contrib.sqla import ModelView
+from flask_login import current_user
 
+class codeBaseView(ModelView):
+    column_list = ['user_id','Submit_time','code_file','problem_id']
+    column_filters = ['user_id','problem_id']
+    can_view_details = True
+    def is_accessible(self):
+        if current_user.is_authenticated:
+            if current_user.role == 2:
+                return True
+        return False
 
 class CodeBase(db.Model):
     __bind_key__ = 'codebase'
