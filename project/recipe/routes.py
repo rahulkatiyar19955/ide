@@ -1,3 +1,4 @@
+import binascii
 import os
 import subprocess
 import filecmp
@@ -116,7 +117,9 @@ def addingtestcases():
     if request.method == 'POST':
         prob_id = request.form['prob_id']
         input_file = request.form['Input']
+        input_file = str(input_file).replace('\r', '')
         output_file = request.form['Output']
+        output_file = str(output_file).replace('\r', '')
         timeout = request.form['Timeout']
 
         testcase = Testcases(input1=input_file, output=output_file, problem_id=prob_id, timeout=timeout)
@@ -124,8 +127,9 @@ def addingtestcases():
         input_filename = 'problem' + str(prob_id) + 'test' + str(testcase.id) + '.txt'
         output_filename = 'refoutput' + input_filename
         dir_path = os.path.join(os.getcwd(), 'project/test_io/')
-        with open(dir_path + input_filename, 'wt') as f:
-            f.write(input_file)
+
+        with open(dir_path + input_filename, 'wb') as f:
+            f.write(bytes(input_file.encode('utf-8')))
         with open(dir_path + output_filename, 'wt') as f:
             f.write(output_file)
         prob = Prob.get_from_id(prob_id)
@@ -325,7 +329,7 @@ def run_code(name: str, tc: str):
     try:
         cmd2 = 'timeout 5s ' + './project/temp_codefolder/' + name + '.out' + ' <project/test_io/' + tc + '.txt >project/test_io/' + str(
             current_user.id) + 'output' + tc + '.txt'
-        # print(cmd2)
+        print(cmd2)
         status_code = subprocess.Popen(cmd2, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
 
         o1, e1 = status_code.communicate()
@@ -368,11 +372,18 @@ def codingIde():
         dir_path_io = os.path.join(os.getcwd(), 'project/test_io/')
         code_filename = 'temp' + str(current_user.id) + '.cpp'
         input_filename = 'inputtemp' + str(current_user.id) + '.txt'
-        # print(code_file)
+        # print(binascii.hexlify(bytes(input_file.encode())))
+        input_file = str(input_file).replace('\r','')
+        # print(binascii.hexlify(bytes(input_file.encode())))
+
         with open(dir_path + code_filename, 'wt') as f:
             f.write(code_file)
-        with open(dir_path_io + input_filename, 'wt') as f:
-            f.write(input_file)
+        with open(dir_path_io + input_filename, 'wt') as f2:
+            f2.write(input_file)
+            # f2.write(bytes(input_file.encode()))
+        # with open(dir_path_io + input_filename, 'rb') as f3:
+        #     temp = f3.read()
+            # print(binascii.hexlify(temp))
         return redirect(url_for('successful_upload'), code=307)
     else:
         return render_template('codingide.html')
@@ -405,7 +416,7 @@ def upload(filename: str, problemid):
                         output_filename = 'output' + 'problem' + str(problemid) + 'test' + str(test.id) + '.txt'
                         with open(dir_path + "ref" + output_filename, 'rt') as f:
                             ref_out = f.read()
-                        with open(dir_path + str(current_user.id) + output_filename, 'rt') as f2:
+                        with open(dir_path + str(current_user.id) + output_filename, 'rb') as f2:
                             user_out = f2.read()
                         with open(dir_path + input_filename, 'rt') as f3:
                             ref_in = f3.read()
