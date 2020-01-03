@@ -1,2 +1,6 @@
 __pycache__/
 /project/models/__pycache__/
+/project/prob.db
+/project/tc.db
+/project/cb.db
+/project/user.db

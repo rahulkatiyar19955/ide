@@ -333,9 +333,15 @@ def run_code(name: str, tc: str):
         status_code = subprocess.Popen(cmd2, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
 
         o1, e1 = status_code.communicate()
+        print(o1,"eroor",str(e1),"st: ",status_code.returncode)
         if status_code.returncode == 124:
             display_str = "Time Limit exceeds"
             return False, display_str
+        # if status_code.returncode == 139:
+        #     display_str = "Segmentation Fault"
+        #     return False, display_str
+        if status_code.returncode!=0:
+            return False, str(e1.decode().split('\n')[1])
         return True, ''
     except Exception as e:
         return False, str(e)
@@ -405,12 +411,12 @@ def upload(filename: str, problemid):
                 a = False
                 run_bool, compiler_message = run_code(filename, testcase)
                 # t.append((test.id, bool_result, compiler_message))
+                dir_path = "project/test_io/"
+                ref_out = ''
+                user_out = ''
+                ref_in = ''
                 if run_bool is True:
                     try:
-                        dir_path = "project/test_io/"
-                        ref_out = ''
-                        user_out = ''
-                        ref_in = ''
 
                         input_filename = 'problem' + str(problemid) + 'test' + str(test.id) + '.txt'
                         output_filename = 'output' + 'problem' + str(problemid) + 'test' + str(test.id) + '.txt'
