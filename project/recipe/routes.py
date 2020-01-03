@@ -304,21 +304,6 @@ def compile_code(name: str, tc: str):
     compiler_out = subprocess.Popen(cmd1, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     o, e = compiler_out.communicate()
     if compiler_out.returncode == 0:
-        # b,e = run_code(name,tc)
-        # try:
-        #     # print()
-        #
-        #     cmd2 = 'timeout 5s ' + './project/temp_codefolder/' + name + '.out' + ' <project/test_io/input' + tc + '.txt >project/test_io/output' + tc + '.txt'
-        #     # print(cmd2)
-        #     status_code = subprocess.Popen(cmd2, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-        #
-        #     o1, e1 = status_code.communicate()
-        #     if status_code.returncode == 124:
-        #         display_str = "Time Limit exceeds"
-        #         return False, "Compiled Successfully ", display_str
-        #     return True, "Compiled Successfully ", ''
-        # except Exception as e:
-        # return b, "Compiled Successfully ", str(e)
         return True, "Compiled Successfully ", ''
     else:
         compiler_error = e.decode('utf-8')
@@ -329,7 +314,7 @@ def run_code(name: str, tc: str):
     try:
         cmd2 = 'timeout 5s ' + './project/temp_codefolder/' + name + '.out' + ' <project/test_io/' + tc + '.txt >project/test_io/' + str(
             current_user.id) + 'output' + tc + '.txt'
-        print(cmd2)
+        # print(cmd2)
         status_code = subprocess.Popen(cmd2, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
 
         o1, e1 = status_code.communicate()
@@ -359,7 +344,7 @@ def successful_upload():
         out, compiler_message = run_code(code_filename, input_filename)
         if out is True:
             dir_path = os.path.join(os.getcwd(), 'project/test_io/')
-            with open(dir_path + output_filename + '.txt', 'rt') as f:
+            with open(dir_path + output_filename + '.txt', 'rb') as f:
                 prog_output = f.read()
             # try:
             #     a = filecmp.cmp('test_output/ref_out1.txt', 'code_output/output1.txt')
