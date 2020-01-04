@@ -15,6 +15,10 @@ from project.models.test_cases import Testcases, testCaseView
 from flask_login import login_user, current_user, logout_user, login_required
 from flask_mail import Message
 from flask_admin.contrib.fileadmin import FileAdmin
+from project.recipe.mail_config import send_mail
+from project.recipe.mail_config import send_otp
+
+
 
 class custom_FileAdmin(FileAdmin):
     can_download = True
@@ -31,6 +35,17 @@ admin.add_view(testCaseView(Testcases, db.session))
 @application.before_first_request
 def create_tables():
     db.create_all()
+
+@application.route('/rahul')
+def rahul():
+    return str(application.config['USERNAME'])
+
+
+@application.route('/verifymail/<user_email>')
+def mail_send(user_email):
+    # print(user_email)
+    send_otp(user_email)
+    return "successfully send"
 
 
 @application.route('/')
@@ -264,7 +279,7 @@ def send_reset_email(user):
 {url_for('reset_token', token=token, _external=True)}
 If you did not make this request then simply ignore this email and no changes will be made.
 '''
-    mail.send(msg)
+    send_mail(msg1=msg.body,rec=user.email)
 
 
 @application.route("/reset_password", methods=['GET', 'POST'])
@@ -424,3 +439,9 @@ def upload(filename: str, problemid):
             return render_template('result.html', compiler_message=compiler_message)
     else:
         return render_template('codingide.html')
+
+
+@application.route('/course')
+def course():
+
+    return render_template('course.html')

@@ -1,10 +1,10 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
-from wtforms import StringField, PasswordField, SubmitField, BooleanField
-from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, IntegerField
+from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError, InputRequired
 from project.models.user import UserModel
 from flask_login import current_user
-
+from project.recipe.mail_config import timeotp, check_otp
 
 class RegistrationForm(FlaskForm):
     username = StringField('Username',
@@ -15,7 +15,14 @@ class RegistrationForm(FlaskForm):
                              validators=[DataRequired()])
     confirm_password = PasswordField('Confirm Password',
                                      validators=[DataRequired(), EqualTo('password')])
+    verify_email = StringField('OTP',
+                               validators=[DataRequired(), InputRequired()])
     submit = SubmitField('Sign Up')
+
+    def validate_verify_email(self,verify_email):
+        user_otp = check_otp(verify_email.data)
+        if not user_otp:
+            raise ValidationError('The otp you entered is either Expired or is Incorrect.')
 
     def validate_username(self, username):
         user = UserModel.query.filter_by(username=username.data).first()

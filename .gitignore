@@ -4,3 +4,4 @@ __pycache__/
 /project/tc.db
 /project/cb.db
 /project/user.db
+config.py
