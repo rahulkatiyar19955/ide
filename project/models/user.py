@@ -25,6 +25,7 @@ class UserModel(db.Model, UserMixin):
     password = db.Column(db.String(80))
     image_file = db.Column(db.String(200), default='default.jpg')
     role = db.Column(db.Integer, default=1)
+    # course = db.Column(db.String(100), nullable=False)
     # codefiles = db.relationship("CodeBase")
 
     def get_reset_token(self, expires_sec=1800):

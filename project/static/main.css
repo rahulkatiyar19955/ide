@@ -111,3 +111,15 @@ a.article-title:hover {
   color: rgb(241, 9, 9) !important;
   display: none;
 }
+
+.flex-container {
+  display: flex;
+}
+
+.box-container {
+  border: 1px solid steelblue;
+  border-radius: 5px;
+  margin: 10px;
+  padding: 10px;
+
+}

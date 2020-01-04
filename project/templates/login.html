@@ -45,8 +45,11 @@
         </form>
     </div>
     <div class="border-top pt-3">
-        <small class="text-muted">
+        <small class="text-muted2">
             Need An Account? <a class="ml-2" href="{{ url_for('register') }}">Sign Up Now</a>
+        </small>
+        <small class="text-muted2">
+                <a href="{{ url_for('reset_request') }}">Forgot Password?</a>
         </small>
     </div>
 {% endblock content %}
