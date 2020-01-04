@@ -2,15 +2,16 @@ import smtplib
 from email.mime.text import MIMEText
 import pyotp
 import os
+from project import application
 
 timeotp = pyotp.TOTP('base32secret3232', interval=120)
 
 smtp_ssl_host = 'smtp.gmail.com'
 smtp_ssl_port = 465
 
-username = os.environ.get("username")
-password = os.environ.get("password")
-# print(username,password)
+username = application.config["USERNAME"]
+password = application.config["PASSWORD"]
+print(username,password)
 sender = 'Rahul'
 
 
