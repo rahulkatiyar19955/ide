@@ -1,31 +1,23 @@
 {% extends "layout.html" %}
 {% block content %}
+        {% for subject in subjects %}
         <article class="media content-section">
-          <div class="">
-              subjec
-          </div>
-          <div class="flex-container">
-              <div class="box-container">
-                  <div class="article-metadata">
-                  <a class="mr-2">subject name</a>
-                  </div>
-                  <small class="text-muted2">uploaded by - rahul</small>
-<!--                  <h2><a class="article-title" href="#">filename</a></h2>-->
+          <a class="mr-2">{{ subject.name }}</a>
+
+              <div class="flex-row-container">
+                  {% for upload in user_uploads %}
+                      {% if subject.id==upload.subject_id %}
+                      <div class="flex-row-item">
+                          <div class="article-metadata">
+                              <a class="mr-2" href={{ url_for('downloadfile',upload_id=upload.id) }}>{{ upload.file_name }}</a>
+                          </div>
+                          <div class="border-top pt-3">uploaded by {{ upload.user_id }}</div>
+                          <div class="text-muted2">uploaded at {{ upload.submitTime.strftime('%Y-%m-%d') }}</div>
+                      </div>
+                      {% endif %}
+                  {% endfor %}
               </div>
-              <div class="box-container">
-                  <div class="article-metadata">
-                  <a class="mr-2">subject name</a>
-                  </div>
-                  <small class="text-muted2">uploaded by - rahul</small>
-                  <h2><a class="article-title" href="#">filename</a></h2>
-              </div>
-              <div class="box-container">
-                  <div class="article-metadata">
-                  <a class="mr-2">subject name</a>
-                  </div>
-                  <small class="text-muted2">uploaded by - rahul</small>
-                  <h2><a class="article-title" href="#">filename</a></h2>
-              </div>
-          </div>
+
         </article>
+        {% endfor %}
 {% endblock content %}

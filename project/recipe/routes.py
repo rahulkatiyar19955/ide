@@ -4,7 +4,7 @@ import subprocess
 import filecmp
 import secrets
 from PIL import Image
-import io
+from io import BytesIO
 from flask import render_template, url_for, flash, redirect, request, send_file
 from project import application, db, bcrypt, mail, admin
 from project.form import RegistrationForm, LoginForm, UpdateAccountForm, RequestResetForm, ResetPasswordForm
@@ -12,6 +12,8 @@ from project.models.user import UserModel,userView
 from project.models.code_base import CodeBase,codeBaseView
 from project.models.prob import Prob, probView
 from project.models.test_cases import Testcases, testCaseView
+from project.models.subject_list import subjectlist, subject_listView
+from project.models.upload_docs import Uploaddocs, upload_docsView
 from flask_login import login_user, current_user, logout_user, login_required
 from flask_mail import Message
 from flask_admin.contrib.fileadmin import FileAdmin
@@ -30,6 +32,8 @@ admin.add_view(probView(Prob, db.session))
 admin.add_view(codeBaseView(CodeBase, db.session))
 admin.add_view(userView(UserModel, db.session))
 admin.add_view(testCaseView(Testcases, db.session))
+admin.add_view(subject_listView(subjectlist, db.session))
+admin.add_view(upload_docsView(Uploaddocs, db.session))
 
 
 @application.before_first_request
@@ -39,6 +43,32 @@ def create_tables():
 @application.route('/rahul')
 def rahul():
     return str(application.config['USERNAME'])
+
+
+@login_required
+@application.route('/download/<upload_id>',methods=['POST','GET'])
+def downloadfile(upload_id):
+    data_file = Uploaddocs.query.filter_by(id=upload_id).first()
+    return send_file(BytesIO(data_file.uploadFile), attachment_filename=data_file.file_name, as_attachment=True)
+
+
+
+
+@login_required
+@application.route('/uploaddocs',methods=['POST','GET'])
+def uploaddocs():
+    if request.method=='GET':
+        subjects = subjectlist.query.all()
+        return render_template('uploaddocs.html',subjects=subjects)
+    else:
+        data_file = request.files['docfile']
+        subjectid = request.form['subj_id']
+        filename = data_file.filename
+        upload_data = Uploaddocs(user_id=current_user.id,file_name=filename,uploadFile=data_file.read(),subject_id=subjectid)
+        upload_data.save_to_db()
+        flash(f'Data Uploaded successfully', 'success')
+        return redirect(url_for('uploaddocs'))
+
 
 
 @application.route('/verifymail/<user_email>')
@@ -443,5 +473,6 @@ def upload(filename: str, problemid):
 
 @application.route('/course')
 def course():
-
-    return render_template('course.html')
+    subjects = subjectlist.query.all()
+    user_uploads = Uploaddocs.query.all()
+    return render_template('course.html',subjects=subjects,user_uploads=user_uploads)

@@ -15,14 +15,14 @@ class RegistrationForm(FlaskForm):
                              validators=[DataRequired()])
     confirm_password = PasswordField('Confirm Password',
                                      validators=[DataRequired(), EqualTo('password')])
-    verify_email = StringField('OTP',
-                               validators=[DataRequired(), InputRequired()])
+    # verify_email = StringField('OTP',
+    #                            validators=[DataRequired(), InputRequired()])
     submit = SubmitField('Sign Up')
 
-    def validate_verify_email(self,verify_email):
-        user_otp = check_otp(verify_email.data)
-        if not user_otp:
-            raise ValidationError('The otp you entered is either Expired or is Incorrect.')
+    # def validate_verify_email(self,verify_email):
+    #     user_otp = check_otp(verify_email.data)
+    #     if not user_otp:
+    #         raise ValidationError('The otp you entered is either Expired or is Incorrect.')
 
     def validate_username(self, username):
         user = UserModel.query.filter_by(username=username.data).first()

@@ -112,6 +112,24 @@ a.article-title:hover {
   display: none;
 }
 
+.flex-row-container {
+    background: #aaa;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+}
+.flex-row-container > .flex-row-item {
+    flex-grow: 1;
+    flex: 1 1 30%;
+    height: 100px;
+}
+
+.flex-row-item {
+  background-color: #e4e4e4;
+  border: 1px solid #c4c1bf;
+}
+
 .flex-container {
   display: flex;
 }

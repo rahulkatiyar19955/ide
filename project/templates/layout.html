@@ -73,6 +73,9 @@
               <ul class="list-group">
                 <li class="list-group-item list-group-item-light">Announcements</li>
                 <li class="list-group-item list-group-item-light"><a href="{{ url_for('course') }}">Course Material</a></li>
+              {% if current_user.is_authenticated %}
+              <li class="list-group-item list-group-item-light"><a href="{{ url_for('uploaddocs') }}">Upload Material</a></li>
+              {% endif %}
               {% if problem_id %}
                   <li class="list-group-item list-group-item-light">LeaderBoard</li>
                   <li class="list-group-item list-group-item-light">

@@ -1,0 +1,24 @@
+{% extends "layout.html" %}
+{% block content %}
+<article class="media content-section" xmlns="http://www.w3.org/1999/html">
+
+          <div class="form-group">
+              <h3> Adding Testcases</h3>
+              <br>
+          <form action="/uploaddocs"  name="form_show" method="post" enctype="multipart/form-data">
+              <div class="form-group">
+              Subject: <select name="subj_id" >
+                          {% for subject in subjects %}
+                            <option value={{subject.id}} selected>{{subject.name}}</option>
+                          {% endfor %}
+                        </select>
+              </div>
+              <input type="file" name="docfile"/>
+              <div class="form-group">
+                  <input type="submit" value="Show"/><br/>
+              </div>
+          </form>
+          </div>
+    </article>
+
+{% endblock content %}
