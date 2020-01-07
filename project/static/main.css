@@ -113,21 +113,29 @@ a.article-title:hover {
 }
 
 .flex-row-container {
-    background: #aaa;
+    background: #ffffff;
     display: flex;
+    flex-direction: row;
     flex-wrap: wrap;
+
     align-items: center;
     justify-content: center;
 }
 .flex-row-container > .flex-row-item {
-    flex-grow: 1;
+    flex-grow: 1
     flex: 1 1 30%;
     height: 100px;
 }
-
+img {
+  max-width: 100%;
+}
 .flex-row-item {
-  background-color: #e4e4e4;
-  border: 1px solid #c4c1bf;
+    flex-direction: row;
+    margin-left:10px;
+    margin-right: 30px;
+    background: #ffff8f;
+  -webkit-box-shadow: -10px 0px 13px -7px #000000, 10px 0px 13px -7px #000000, 5px 5px 15px 5px rgba(0,0,0,0);
+    box-shadow: -10px 0px 13px -7px #000000, 10px 0px 13px -7px #000000, 5px 5px 15px 5px rgba(0,0,0,0);
 }
 
 .flex-container {

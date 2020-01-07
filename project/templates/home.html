@@ -1,5 +1,6 @@
 {% extends "layout.html" %}
 {% block content %}
+    {% if current_user.is_authenticated %}
     {% for problem in data %}
         <article class="media content-section">
           <div class="media-body">
@@ -12,4 +13,10 @@
           </div>
         </article>
     {% endfor %}
+    {% else %}
+    <div class="images" ">
+        <img src="static/welcome.jpeg" alt="Welcome to CodingIde">
+    </div>
+
+    {% endif %}
 {% endblock content %}

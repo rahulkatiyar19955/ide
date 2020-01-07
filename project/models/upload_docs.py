@@ -16,7 +16,7 @@ class Uploaddocs(db.Model):
     __bind_key__ = 'uploaddocs'
     __tablename__ = "uploaddocs"
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    user_id = db.Column(db.String(100), nullable=False)
     subject_id = db.Column(db.Integer, nullable=False)
     file_name = db.Column(db.String(100), nullable=False)
     uploadFile = db.Column(db.LargeBinary, nullable=False)

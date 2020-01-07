@@ -27,7 +27,7 @@
           <div class="collapse navbar-collapse" id="navbarToggle">
             <div class="navbar-nav mr-auto">
               <a class="nav-item nav-link" href="{{ url_for('home') }}">Home</a>
-              <a class="nav-item nav-link" href="{{ url_for('home') }}">About</a>
+              <a class="nav-item nav-link" href="{{ url_for('about') }}">About</a>
               {% if current_user.is_authenticated %}
                 {% if current_user.role == 2 %}
                     <a class="nav-item nav-link" href="{{ url_for('adding') }}">Problems</a>

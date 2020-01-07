@@ -2,14 +2,14 @@
 {% block content %}
         {% for subject in subjects %}
         <article class="media content-section">
-          <a class="mr-2">{{ subject.name }}</a>
-
+            <div class="mr-2">{{ subject.name }}</div>
               <div class="flex-row-container">
+
                   {% for upload in user_uploads %}
                       {% if subject.id==upload.subject_id %}
                       <div class="flex-row-item">
                           <div class="article-metadata">
-                              <a class="mr-2" href={{ url_for('downloadfile',upload_id=upload.id) }}>{{ upload.file_name }}</a>
+                              <a class="mr-2" href="{{ url_for('downloadfile',upload_id=upload.id) }}">{{ upload.file_name }}</a>
                           </div>
                           <div class="border-top pt-3">uploaded by {{ upload.user_id }}</div>
                           <div class="text-muted2">uploaded at {{ upload.submitTime.strftime('%Y-%m-%d') }}</div>

@@ -64,7 +64,7 @@ def uploaddocs():
         data_file = request.files['docfile']
         subjectid = request.form['subj_id']
         filename = data_file.filename
-        upload_data = Uploaddocs(user_id=current_user.id,file_name=filename,uploadFile=data_file.read(),subject_id=subjectid)
+        upload_data = Uploaddocs(user_id=current_user.username,file_name=filename,uploadFile=data_file.read(),subject_id=subjectid)
         upload_data.save_to_db()
         flash(f'Data Uploaded successfully', 'success')
         return redirect(url_for('uploaddocs'))
@@ -85,6 +85,11 @@ def home():
         problem_list = Prob.query.all()
         return render_template('home.html', data=problem_list)
     return render_template('home.html')
+
+
+@application.route('/about')
+def about():
+    return render_template('about.html')
 
 
 @application.route('/problems/<problem_id>', methods=['GET', 'POST'])
