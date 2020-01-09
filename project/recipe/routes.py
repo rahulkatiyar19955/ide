@@ -45,6 +45,12 @@ def rahul():
     return str(application.config['USERNAME'])
 
 
+@application.route('/subject/<subject_id>')
+def subjects(subject_id):
+    files = Uploaddocs.query.filter_by(subject_id=subject_id).all()
+    return render_template('subjects.html',files=files)
+
+
 @login_required
 @application.route('/download/<upload_id>',methods=['POST','GET'])
 def downloadfile(upload_id):
