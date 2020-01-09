@@ -1,5 +1,5 @@
-USERNAME = 'rahulkatiyar19955@gmail.com'
-PASSWORD = '9784331618'
+USERNAME = 'ra'
+PASSWORD = '8'
 SQLALCHEMY_DATABASE_URI = "sqlite:///user.db"
 # SQLALCHEMY_DATABASE_URI = "mysql+pymysql://admin:amazondata@database1.calnggnlssfl.us-east-1.rds.amazonaws.com
 # /ide_database" SQLALCHEMY_BINDS = {'codebase':
