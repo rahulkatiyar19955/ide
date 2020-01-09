@@ -1,12 +1,11 @@
 {% extends "layout.html" %}
 {% block content %}
         <article class="media content-section">
-
           <ul>
-              <h4> Subjects </h4>
-              {% for subject in subjects %}
+              {% for file in files %}
               <li>
-                  <a href="{{ url_for('subjects',subject_id=subject.id)}}"> {{ subject.name }} </a>
+                  <a href="{{ url_for('downloadfile',upload_id=file.id)}}"> {{ file.file_name }} </a>
+                  <a style="color: red"> Uploaded By {{ file.user_id }} </a>
               </li>
               {% endfor %}
           </ul>

@@ -9,7 +9,7 @@ SQLALCHEMY_DATABASE_URI = "sqlite:///user.db"
 SQLALCHEMY_BINDS = {'codebase': "sqlite:///cb.db",
                     'testcases': "sqlite:///tc.db",
                     'subjectlist': "sqlite:///subjects.db",
-                    'uploaddocs': "sqlite:///upload.db",
+                    'uploaddocs': "sqlite:///upload2.db",
                     'problems': "sqlite:///prob.db"}
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 SECRET_KEY = 'MY_SECRET_KEY'

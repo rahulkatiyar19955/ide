@@ -5,7 +5,6 @@ from datetime import datetime
 
 class upload_docsView(ModelView):
     column_list = {'id','user_id','subject_id','file_name','submitTime'}
-
     def is_accessible(self):
         if current_user.is_authenticated:
             if current_user.role == 2:
