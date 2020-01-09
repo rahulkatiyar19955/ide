@@ -45,18 +45,11 @@ def rahul():
     return str(application.config['USERNAME'])
 
 
-@application.route('/subject/<subject_id>')
-def subjects(subject_id):
-    files = Uploaddocs.query.filter_by(subject_id=subject_id).all()
-    return render_template('subjects.html',files=files)
-
-
 @login_required
 @application.route('/download/<upload_id>',methods=['POST','GET'])
 def downloadfile(upload_id):
-    db.session.commit()
-    data_file2 = Uploaddocs.query.filter_by(id=upload_id).first()
-    return send_file(BytesIO(data_file2.uploadFile), attachment_filename=data_file2.file_name, as_attachment=True)
+    data_file = Uploaddocs.query.filter_by(id=upload_id).first()
+    return send_file(BytesIO(data_file.uploadFile), attachment_filename=data_file.file_name, as_attachment=True)
 
 
 
@@ -71,7 +64,6 @@ def uploaddocs():
         data_file = request.files['docfile']
         subjectid = request.form['subj_id']
         filename = data_file.filename
-        db.session.commit()
         upload_data = Uploaddocs(user_id=current_user.username,file_name=filename,uploadFile=data_file.read(),subject_id=subjectid)
         upload_data.save_to_db()
         flash(f'Data Uploaded successfully', 'success')
