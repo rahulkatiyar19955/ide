@@ -400,7 +400,7 @@ def successful_upload():
         out, compiler_message = run_code(code_filename, input_filename)
         if out is True:
             dir_path = os.path.join(os.getcwd(), 'project/test_io/')
-            with open(dir_path + output_filename + '.txt', 'rb') as f:
+            with open(dir_path + output_filename + '.txt', 'rt') as f:
                 prog_output = f.read()
             # try:
             #     a = filecmp.cmp('test_output/ref_out1.txt', 'code_output/output1.txt')
